@@ -11,7 +11,8 @@ export default function App() {
     const [open, setOpen] = React.useState(false);
     const [messageValue, setMessageValue] = React.useState('');
     const [success, setSuccess] = React.useState(true)
-
+    const [tFError, setTFError] = React.useState(false)
+    const [tFHelperText, setTFHelperText] = React.useState('')
 
     const theme = createMuiTheme({
         palette: {
@@ -28,21 +29,6 @@ export default function App() {
     // https://stackoverflow.com/questions/29791721/how-get-data-from-material-ui-textfield-dropdownmenu-components
     // TODO: Character limit
     // TODO: Title of a message
-
-    const postMessage = async msg => {
-        await fetch('api/post_message', {
-            method: 'POST',
-            mode: 'same-origin',
-            cache: 'no-cache',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({msg})
-        })
-            .then(r => {
-                return r
-            })
-    }
 
     const _handleMessageChange = (e) => {
         setMessageValue(e.target.value)
@@ -66,19 +52,39 @@ export default function App() {
         }
     }
 
-    const _messageHandler = () => {
+    const _messageHandler = async () => {
+        setTFError(false)
+        setTFHelperText('')
         console.log(messageValue)
         if (!messageValue.trim().length){
-            setSuccess(false)
+            setTFError(true)
+            setTFHelperText("Message cannot be empty")
         }
         else {
-            if (postMessage(messageValue).status === 200) {
-                setSuccess(true)
-            } else {
-                setSuccess(false)
-            }
+            await fetch('api/post_message', {
+                method: 'POST',
+                mode: 'same-origin',
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({message: messageValue})
+            })
+                .then(r => {
+                    if (r.status === 200) {
+                        setSuccess(true)
+                    }
+                    else{
+                        setSuccess(false)
+                    }
+                    setOpen(true)
+                })
+
+                .catch(err => {
+                    console.log(err)
+                })
         }
-        setOpen(true);
+
     }
       return (
           <div className="App">
@@ -87,6 +93,8 @@ export default function App() {
                       Sample Spotted
                   </header>
                   <TextField
+                      helperText={tFHelperText}
+                      error={tFError}
                       className='message'
                       label="Message"
                       placeholder="Write the message here"
@@ -105,7 +113,7 @@ export default function App() {
                   </Button>
                   <Snackbar
                       open={open}
-                      autoHideDuration={6000}
+                      autoHideDuration={2000}
                       onClose={_handleClose}
                   >
                       <MuiAlert
