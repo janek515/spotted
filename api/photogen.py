@@ -1,7 +1,7 @@
 #  Copyright (c) 2020. Jan Ochwat.NesTeam
 import random
 from PIL import Image, ImageDraw, ImageFont
-from text_wrap import text_wrap
+from api.text_wrap import text_wrap
 import os.path
 
 

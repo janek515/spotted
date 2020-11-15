@@ -1,7 +1,7 @@
 import requests
 import base64
 from flask import Flask, request
-from photogen import PhotoGen
+from api.photogen import PhotoGen
 
 app = Flask(__name__, static_folder='../build', static_url_path='/')
 
