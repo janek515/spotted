@@ -1,0 +1,24 @@
+{
+  "en-US": {
+    "Message" : "Message",
+    "SendMessage": "Send Message",
+    "Error": "An Error Occurred while trying to post the message. Please try again later.",
+    "CalmDown": "Wait to send another message",
+    "Success": "Message successfully posted",
+    "TooLong": "Message is too long",
+    "CantBeEmpty": "Message cannot be empty",
+    "Dupes": "Cannot send duplicate messages",
+    "WriteMessageHere": "Write the message here"
+  },
+  "pl-PL": {
+    "Message" : "Wiadomość",
+    "SendMessage": "Wyślij wiadomość",
+    "Error": "Wystąpił błąd, spróbuj ponownie później.",
+    "CalmDown": "Poczekaj, aby wysłać kolejną wiadomość.",
+    "Success": "Wysłano wiadomość.",
+    "TooLong": "Wiadomość jest za długa.",
+    "CantBeEmpty": "Wiadomość nie może być pusta.",
+    "Dupes": "Nie można wysłać takiej samej wiadomości.",
+    "WriteMessageHere": "Wpisz wiadomość tutaj"
+  }
+}

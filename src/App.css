@@ -16,10 +16,9 @@ body {
 }
 .message {
   width: 95%;
-  max-width: 500px;
+  max-width: 355px;
 }
 #sendButton {
-  margin-top: 10px;
   color: black;
   width: 75%;
   max-width: 420px;
