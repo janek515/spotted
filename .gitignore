@@ -173,4 +173,6 @@ dmypy.json
 # End of https://www.toptal.com/developers/gitignore/api/flask
 .flaskenv
 .idea
-api/message.jpg
+message.jpg
+test.py
+api/misc
