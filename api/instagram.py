@@ -98,6 +98,8 @@ class InstagramUploader:
 
     def upload(self):
         self.now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S ")
+        self.logger.info(self.photo)
+        self.logger.info('^PHOTO')
         photoreq = self.session.request(
             'POST',
             self.uploadUrl + self.nameEntity,
