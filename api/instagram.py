@@ -93,11 +93,8 @@ class InstagramUploader:
             }
         )
         self.logger.info(loginreq.headers)
-        print(loginreq.headers)
         self.logger.info(loginreq.content)
-        print(loginreq.content)
         self.logger.info(loginreq.status_code)
-        print(loginreq.status_code)
 
     def upload(self):
         self.now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S ")
@@ -110,8 +107,6 @@ class InstagramUploader:
             data=self.photo
         )
         self.photoResponse = json.loads(photoreq.text)
-        self.logger.info(self.photoResponse)
-        print(self.photoResponse)
         if 'upload_id' in self.photoResponse:
             uploadreq = self.session.request(
                 'POST',
