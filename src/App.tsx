@@ -48,6 +48,7 @@ export default function App() {
     //@ts-ignore
     const timeBetweenMessages = Config.default.TimeBetweenMessages
     let textInput = React.useRef<HTMLTextAreaElement | undefined>(undefined)
+    document.title = header
 
     //https://stackoverflow.com/a/45252226/11643883
     const countRows = (textarea: HTMLTextAreaElement | undefined): number => {
