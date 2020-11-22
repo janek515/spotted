@@ -21,7 +21,7 @@ def getmessage():
                    "reason": "Bad Request"
                }, 400
     generator = PhotoGen(message, app.logger)
-    uploader = InstagramUploader(username, username, generator.gen(), app.logger)
+    uploader = InstagramUploader(username, password, generator.gen(), app.logger)
     uploader.login()
     status = uploader.upload()
     if status.status_code == 200:
