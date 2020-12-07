@@ -121,7 +121,7 @@ export default function App() {
 
         setOpen(false);
     };
-    // TODO: Implement different error messages for different errors (16.11 partially done)
+    // TODO: Implement different error messages for different errors (16.11.2020 partially done)
     const _snackBarHandler = (): [severity: Color, msg: string] => {
         if (snackBarValue === 1) {
             return ['success', strings.Success]
@@ -138,14 +138,13 @@ export default function App() {
         if (countRows(textInput.current) > 7 || textInput.current!.value.length > 293) {
             setTFHelperText(strings.TooLong)
             setTFError(true)
-        } else {
-            if (lastMessageSentTime !== 0 && (Date.now() - lastMessageSentTime) < (timeBetweenMessages * 1000)) {
+        } else if (lastMessageSentTime !== 0 && (Date.now() - lastMessageSentTime) < (timeBetweenMessages * 1000)) {
                 setSnackBarValue(2)
                 setOpen(true)
-            } else if (lastMessageContent === textInput.current!.value) {
+        } else if (lastMessageContent === textInput.current!.value) {
                 setSnackBarValue(3)
                 setOpen(true)
-            } else {
+        } else {
                 setTFError(false)
                 setTFHelperText('')
                 console.log(textInput.current!.value)
@@ -181,7 +180,7 @@ export default function App() {
                         })
                 }
             }
-        }
+        
     }
     return (
         <div className="App">
