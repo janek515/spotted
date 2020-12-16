@@ -74,7 +74,8 @@ class InstagramUploader:
         self.photoResponse = None
 
     def getshareddata(self):
-        return self.session.get(self.sharedDataUrl).text
+        return self.session.get(self.sharedDataUrl, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/86.0.4240.198 Safari/537.36'}).text
 
     def login(self):
         loginreq = self.session.request(
