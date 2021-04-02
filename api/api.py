@@ -14,12 +14,13 @@ app.logger.info(f'{username} _ {password}')
 
 @app.route('/api/post_message', methods=['POST'])
 def getmessage():
-    message = request.json['message']
-    if message is None:
+    message = request.json
+    if message is None or message["message"] is (None or ""):
         return {
                    "post": "unsuccessful",
                    "reason": "Bad Request"
                }, 400
+    message = message["message"]
     generator = PhotoGen(message, app.logger)
     uploader = InstagramUploader(username, password, generator.gen(), app.logger)
     uploader.login()

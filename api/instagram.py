@@ -5,6 +5,13 @@ import json
 import datetime
 import random
 from tzlocal import get_localzone
+import Cryptodome.Random
+from Cryptodome.Cipher import AES
+import libnacl.sealed
+import libnacl.public
+import base64
+import struct
+import libnacl
 
 # Based on:
 # https://stackoverflow.com/a/62799458/11643883 ,
@@ -27,8 +34,9 @@ class InstagramUploader:
         self.logger.info(self.sharedData)
         self.csrfToken = self.sharedData['config']['csrf_token']
         self.time = str(round(time.time() * 1000)).encode()
-        self.password = f'#PWD_INSTAGRAM_BROWSER:0:{self.time.decode("utf-8")}:{password}'
-        self.logger.info(self.password)
+        self.password = password
+        self.enc_password = self.encrypt_password()
+        self.logger.info(self.enc_password)
 
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
@@ -74,8 +82,9 @@ class InstagramUploader:
         self.photoResponse = None
 
     def getshareddata(self):
-        return self.session.get(self.sharedDataUrl, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                          'Chrome/86.0.4240.198 Safari/537.36'}).text
+        return self.session.get(self.sharedDataUrl,
+                                headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                                                       ' (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36'}).text
 
     def login(self):
         loginreq = self.session.request(
@@ -84,7 +93,7 @@ class InstagramUploader:
             headers=self.headers,
             data={
                 "username": self.username,
-                "enc_password": self.password,
+                "enc_password": self.enc_password,
                 'queryParams': {},
                 'optIntoOneTap': 'false'
             },
@@ -127,3 +136,27 @@ class InstagramUploader:
             return uploadreq
         else:
             raise Exception('Failed to upload the photo')
+
+    def encrypt_password(self):
+        cur_time_str = str(round(time.time())).encode()
+        key_bytes = bytes.fromhex(self.sharedData["encryption"]["public_key"])
+        key = Cryptodome.Random.get_random_bytes(32)
+        plaintext = self.password.encode()
+        cipher = AES.new(key, AES.MODE_GCM, nonce=bytes([0] * 12))
+        cipher.update(cur_time_str)
+        cipher_text, tag = cipher.encrypt_and_digest(plaintext)
+        encrypted_key = libnacl.sealed.SealedBox(key_bytes).encrypt(key)
+        len_bytes = struct.pack('<h', len(encrypted_key))
+        info = bytes([1, int(self.sharedData["encryption"]["key_id"])])
+
+        # print(cipher_text.hex())
+        # print(tag.hex())
+        # print(len_bytes.hex())
+        # print(info.hex())
+        # print(encrypted_key.hex())
+
+        obytes = info + len_bytes + encrypted_key + tag + cipher_text
+        # print(type(obytes))
+
+        return f'#PWD_INSTAGRAM_BROWSER:{self.sharedData["encryption"]["version"]}:{cur_time_str.decode("utf-8")}:' \
+               f'{base64.b64encode(obytes).decode("utf-8")}'
