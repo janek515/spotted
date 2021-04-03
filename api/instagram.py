@@ -39,7 +39,8 @@ class InstagramUploader:
         self.logger.info(self.enc_password)
 
         self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; '
+                          'Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                           'Chrome/86.0.4240.198 Safari/537.36',
             'Accept-Language': 'en-US',
             'X-Instagram-AJAX': str(1),
@@ -49,7 +50,8 @@ class InstagramUploader:
         }
         self.tz = get_localzone()
         self.now = None
-        self.offset = -int(datetime.datetime.now().astimezone(self.tz).utcoffset().total_seconds()/60)
+        self.offset = -int(datetime.datetime.now()
+                           .astimezone(self.tz).utcoffset().total_seconds()/60)
         self.uploadParams = {
             "media_type": 1,
             "upload_id": str(round(time.time() * 1000)),
@@ -62,7 +64,8 @@ class InstagramUploader:
                 "quality": '80'
             })
         }
-        self.nameEntity = f'{round(time.time() * 1000)}_0_{random.randrange(1000000000, 9999999999)}'
+        self.nameEntity = f'{round(time.time() * 1000)}' \
+                          f'_0_{random.randrange(1000000000, 9999999999)}'
         self.photoHeaders = {
             'x-entity-type': 'image/jpeg',
             'offset': '0',
@@ -83,8 +86,10 @@ class InstagramUploader:
 
     def getshareddata(self):
         return self.session.get(self.sharedDataUrl,
-                                headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-                                                       ' (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36'}).text
+                                headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; '
+                                                       'Win64; x64) AppleWebKit/537.36'
+                                                       ' (KHTML, like Gecko) Chrome/86'
+                                                       '.0.4240.198 Safari/537.36'}).text
 
     def login(self):
         loginreq = self.session.request(
@@ -134,8 +139,7 @@ class InstagramUploader:
             self.logger.info(uploadreq.text)
             self.logger.info(uploadreq.reason)
             return uploadreq
-        else:
-            raise Exception('Failed to upload the photo')
+        raise Exception('Failed to upload the photo')
 
     def encrypt_password(self):
         cur_time_str = str(round(time.time())).encode()
@@ -158,5 +162,6 @@ class InstagramUploader:
         obytes = info + len_bytes + encrypted_key + tag + cipher_text
         # print(type(obytes))
 
-        return f'#PWD_INSTAGRAM_BROWSER:{self.sharedData["encryption"]["version"]}:{cur_time_str.decode("utf-8")}:' \
-               f'{base64.b64encode(obytes).decode("utf-8")}'
+        return f'#PWD_INSTAGRAM_BROWSER:{self.sharedData["encryption"]["version"]}' \
+               f':{cur_time_str.decode("utf-8")}' \
+               f':{base64.b64encode(obytes).decode("utf-8")}'

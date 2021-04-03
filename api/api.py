@@ -27,12 +27,11 @@ def getmessage():
     status = uploader.upload()
     if status.status_code == 200:
         return {"post": "successful"}
-    else:
-        return {
-                   "post": "unsuccessful",
-                   "reason": "Upload API Error",
-                   "message": status.text
-               }, 500
+    return {
+               "post": "unsuccessful",
+               "reason": "Upload API Error",
+               "message": status.text
+           }, 500
 
 
 @app.route('/')

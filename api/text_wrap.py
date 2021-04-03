@@ -19,7 +19,8 @@ def text_wrap(text, font, max_width):
     lines = []
     tekst = []
 
-    # This checks for any special characters that font.getsize does not like (it's made for polish alphabet)
+    # This checks for any special characters that font.getsize does not like
+    # (it's made for polish alphabet)
     for x in text:
         if re.match('[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]', x) is not None:
             tekst.append('w')
@@ -28,7 +29,7 @@ def text_wrap(text, font, max_width):
     finaltext = ''.join(tekst)
     # If the text width is smaller than the image width, then no need to split
     # just add it to the line list and return
-    if font.getsize(finaltext)[0]  <= max_width:
+    if font.getsize(finaltext)[0] <= max_width:
         lines.append(text)
     else:
         # split the line by spaces to get words
