@@ -10,8 +10,8 @@ import MuiAlert, {Color} from '@material-ui/lab/Alert';
 import Snackbar from '@material-ui/core/Snackbar';
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import * as Config from './sconfig.json';
-import * as Locales from './loc/strings.json';
+let Config = require('./sconfig.json')
+let Locales = require('./locales.json')
 
 let _buffer: HTMLTextAreaElement | null;
 
@@ -26,7 +26,6 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
         position: 'absolute',
         top: '50%',
         left: '50%',
-        //marginTop: -12,
         marginLeft: -12,
     }
 }))
@@ -39,19 +38,20 @@ export default function App() {
     const [tFHelperText, setTFHelperText] = React.useState<string>('')
     const [sending, setSending] = React.useState<boolean>(false)
     const [lastMessageSentTime, setLastMessageSentTime] = React.useState<number>(0)
-    const [lastMessageContent, setLastMessageContent] = React.useState<string | undefined>(undefined)
-    // TODO: Fix JSON implementation
-    // @ts-ignore
-    const strings = Locales.default[Config.default.locale]
-    //@ts-ignore
-    const header = Config.default.Header
-    //@ts-ignore
-    const timeBetweenMessages = Config.default.TimeBetweenMessages
+    const [lastMessageContent, setLastMessageContent] = React.useState<string>('')
+    const strings = Locales[Config.locale]
+    const header = Config.Header
+    const timeBetweenMessages = Config.TimeBetweenMessages
     let textInput = React.useRef<HTMLTextAreaElement | undefined>(undefined)
     document.title = header
 
     //https://stackoverflow.com/a/45252226/11643883
-    const countRows = (textarea: HTMLTextAreaElement | undefined): number => {
+    const checkSize = (): boolean => {
+        let textarea = textInput.current
+
+        if (textarea!.value.length > 293){
+            return false
+        }
 
         if (_buffer == null) {
             _buffer = document.createElement('textarea');
@@ -92,8 +92,7 @@ export default function App() {
 
         let result = Math.floor(_buffer.scrollHeight / lh);
         if (result === 0) result = 1;
-        return result;
-
+        return result <= 7;
 
     }
 
@@ -110,9 +109,7 @@ export default function App() {
     });
 
     // https://stackoverflow.com/questions/29791721/how-get-data-from-material-ui-textfield-dropdownmenu-components
-    // TODO: Character limit
     // TODO: Title of a message
-
 
     const _handleClose = (event: React.SyntheticEvent, reason?: string) => {
         if (reason === 'clickaway') {
@@ -121,65 +118,70 @@ export default function App() {
 
         setOpen(false);
     };
-    // TODO: Implement different error messages for different errors (16.11.2020 partially done)
     const _snackBarHandler = (): [severity: Color, msg: string] => {
-        if (snackBarValue === 1) {
-            return ['success', strings.Success]
-        } else if (snackBarValue === 2) {
-            return ['error', strings.CalmDown]
-        } else if (snackBarValue === 3) {
-            return ['error', strings.Dupes]
-        } else {
-            return ['error', strings.Error]
+        switch (snackBarValue) {
+            case 1:
+                return ['success', strings.Success]
+            case 2:
+                return ['error', strings.CalmDown]
+            case 3:
+                return ['error', strings.Dupes]
+            default:
+                return ['error', strings.Error]
         }
     }
 
     const _messageHandler = async () => {
-        if (countRows(textInput.current) > 7 || textInput.current!.value.length > 293) {
+        setTFError(false)
+        setTFHelperText('')
+        console.log(textInput.current!.value)
+        if (!textInput.current!.value.trim().length) {
+            setTFError(true)
+            setTFHelperText(strings.CantBeEmpty)
+            return
+        }
+        if (!checkSize()) {
             setTFHelperText(strings.TooLong)
             setTFError(true)
-        } else if (lastMessageSentTime !== 0 && (Date.now() - lastMessageSentTime) < (timeBetweenMessages * 1000)) {
-                setSnackBarValue(2)
-                setOpen(true)
-        } else if (lastMessageContent === textInput.current!.value) {
-                setSnackBarValue(3)
-                setOpen(true)
-        } else {
-                setTFError(false)
-                setTFHelperText('')
-                console.log(textInput.current!.value)
-                if (!textInput.current!.value.trim().length) {
-                    setTFError(true)
-                    setTFHelperText(strings.CantBeEmpty)
-                } else {
-                    setSending(true)
-                    await fetch('api/post_message', {
-                        method: 'POST',
-                        mode: 'same-origin',
-                        cache: 'no-cache',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({message: textInput.current!.value})
-                    })
-                        .then(r => {
-                            setSending(false)
-                            if (r.status === 200) {
-                                setSnackBarValue(1)
-                                setLastMessageContent(textInput.current!.value)
-                                textInput.current!.value = ''
-                                setLastMessageSentTime(Date.now())
-                            } else {
-                                setSnackBarValue(0)
-                            }
-                            setOpen(true)
-                        })
-
-                        .catch(err => {
-                            console.log(err)
-                        })
+            return
+        }
+        if (lastMessageSentTime !== 0 && (Date.now() - lastMessageSentTime) < (timeBetweenMessages * 1000)) {
+            setSnackBarValue(2)
+            setOpen(true)
+            return
+        }
+        if (lastMessageContent === textInput.current!.value) {
+            setSnackBarValue(3)
+            setOpen(true)
+            return
+        }
+        setSending(true)
+        await fetch('api/post_message', {
+            method: 'POST',
+            mode: 'same-origin',
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({message: textInput.current!.value})
+        })
+            .then(r => {
+                setSending(false)
+                if (r.status === 200) {
+                    setSnackBarValue(1)
+                    setLastMessageContent(textInput.current!.value)
+                    textInput.current!.value = ''
+                    setLastMessageSentTime(Date.now())
+                    setOpen(true)
+                    return
                 }
-            }
+                setSnackBarValue(0)
+                setOpen(true)
+            })
+
+            .catch(err => {
+                console.log(err)
+            })
         
     }
     return (
@@ -213,7 +215,7 @@ export default function App() {
                 </div>
                 <Snackbar
                     open={open}
-                    autoHideDuration={2000}
+                    autoHideDuration={4000}
                     onClose={_handleClose}
                 >
                     <MuiAlert

@@ -1,10 +1,11 @@
 # Spotted
-'Spotted style' React App which transforms messages into images and uploads them to instagram.
+Spotted style React App which transforms messages into images and uploads them to instagram.
 
 
 # Dependencies
 
 In order to install dependencies use yarn and pipenv.
+You need python 3.9 installed.
 
 ```shell
 pipenv sync
@@ -36,13 +37,23 @@ Front-end configuration file `sconfig.json` is located in the `src` subfolder an
 
 ### locales
 
-As of today only Polish and English have their locales, feel free to add yours, by creating a key with its name inside `/src/loc/strings.json` file.
+As of today only Polish and English have their locales, feel free to add yours, by creating a key with its name inside `/src/locales.json` file.
 
-## Deployment
+## Building
 
-The can be served with gunicorn by default.
+To build the React app you need to run `yarn build`
 
-A `Procfile` for easy heroku deployment is included
+# Deployment
+
+The app can be served with a wsgi server, it should be served using `wsgi.py` as a handle.
+
+An example command for gunicorn:
+
+```shell
+gunicorn wsgi:app
+```
+
+There is a `Procfile` included for easy heroku deployment.
 
 # License
 
