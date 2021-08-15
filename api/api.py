@@ -32,7 +32,13 @@ def post_message():
             "post": "unsuccessful",
             "reason": "Login error"
         }, 500
-    status = uploader.upload()
+    try:
+        status = uploader.upload()
+    except Exception as e:
+        return {
+            "post": "unsuccessful",
+            "reason": "Couldn't upload photo"
+        }, 500
     if status.status_code == 200:
         uploader.log_out()
         return {"post": "successful"}

@@ -175,6 +175,9 @@ export default function App() {
                     setOpen(true)
                     return
                 }
+                r.json().then(json => {
+                    console.log(json)
+                })
                 setSnackBarValue(0)
                 setOpen(true)
             })
