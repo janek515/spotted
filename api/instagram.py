@@ -13,6 +13,7 @@ import base64
 import libnacl
 import logging
 
+
 # Based on:
 # https://stackoverflow.com/a/62799458/11643883 ,
 # https://github.com/jlobos/instagram-web-api
@@ -20,7 +21,8 @@ import logging
 
 class InstagramUploader:
 
-    def __init__(self, username: str, password: str, photo: bytes, logger: logging.Logger):
+    def __init__(self, username: str, password: str, photo: bytes,
+                 logger: logging.Logger):
         self.photo = photo
         self.session = requests.session()
         self.username = username
@@ -51,7 +53,7 @@ class InstagramUploader:
         self.tz = get_localzone()
         self.now = None
         self.offset = -int(datetime.datetime.now()
-                           .astimezone(self.tz).utcoffset().total_seconds()/60)
+                           .astimezone(self.tz).utcoffset().total_seconds() / 60)
         self.upload_params = {
             "media_type": 1,
             "upload_id": str(round(time.time() * 1000)),
@@ -117,7 +119,8 @@ class InstagramUploader:
                 "ig_cb": '1'
             }
         ).json()
-        if login_response["status"] == "fail" or login_response["authenticated"] == "False":
+        if login_response["status"] == "fail" \
+                or login_response["authenticated"] == "False":
             self.logger.error("Failed to login")
             return False
         self.logger.info("Logged in successfully")
@@ -171,7 +174,8 @@ class InstagramUploader:
         key_length_bytes = len(encrypted_key).to_bytes(2, "little")
         info = bytes([1, int(self.shared_data["encryption"]["key_id"])])
 
-        encrypted_password_bytes = info + key_length_bytes + encrypted_key + tag + cipher_text
+        encrypted_password_bytes = \
+            info + key_length_bytes + encrypted_key + tag + cipher_text
 
         return f'#PWD_INSTAGRAM_BROWSER:{self.shared_data["encryption"]["version"]}' \
                f':{current_time_bytes.decode("utf-8")}' \

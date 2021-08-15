@@ -34,7 +34,7 @@ def post_message():
         }, 500
     try:
         status = uploader.upload()
-    except Exception as e:
+    except Exception:
         return {
             "post": "unsuccessful",
             "reason": "Couldn't upload photo"
