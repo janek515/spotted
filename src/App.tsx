@@ -2,18 +2,18 @@
  * Copyright (c) 2020. Jan Ochwat
  */
 // TODO: Add tests (jest-dom)
-import * as React from 'react';
-import './App.css';
-import {createMuiTheme, createStyles, makeStyles, Theme, ThemeProvider} from '@material-ui/core/styles';
-import TextField from "@material-ui/core/TextField";
-import MuiAlert, {Color} from '@material-ui/lab/Alert';
-import Snackbar from '@material-ui/core/Snackbar';
-import Button from "@material-ui/core/Button";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import * as React from 'react'
+import './App.css'
+import {createMuiTheme, createStyles, makeStyles, Theme, ThemeProvider} from '@material-ui/core/styles'
+import TextField from "@material-ui/core/TextField"
+import MuiAlert, {Color} from '@material-ui/lab/Alert'
+import Snackbar from '@material-ui/core/Snackbar'
+import Button from "@material-ui/core/Button"
+import CircularProgress from "@material-ui/core/CircularProgress"
 let Config = require('./sconfig.json')
 let Locales = require('./locales.json')
 
-let _buffer: HTMLTextAreaElement | null;
+let _buffer: HTMLTextAreaElement | null
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
     wrapper: {
@@ -31,8 +31,8 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 }))
 
 export default function App() {
-    const classes = useStyles();
-    const [open, setOpen] = React.useState<boolean>(false);
+    const classes = useStyles()
+    const [open, setOpen] = React.useState<boolean>(false)
     const [snackBarValue, setSnackBarValue] = React.useState<number>(0)
     const [tFError, setTFError] = React.useState<boolean>(false)
     const [tFHelperText, setTFHelperText] = React.useState<string>('')
@@ -54,45 +54,45 @@ export default function App() {
         }
 
         if (_buffer == null) {
-            _buffer = document.createElement('textarea');
-            _buffer.style.border = 'none';
-            _buffer.style.height = '0';
-            _buffer.style.overflow = 'hidden';
-            _buffer.style.padding = '0';
-            _buffer.style.position = 'absolute';
-            _buffer.style.left = '0';
-            _buffer.style.top = '0';
-            _buffer.style.zIndex = '-1';
-            document.body.appendChild(_buffer);
+            _buffer = document.createElement('textarea')
+            _buffer.style.border = 'none'
+            _buffer.style.height = '0'
+            _buffer.style.overflow = 'hidden'
+            _buffer.style.padding = '0'
+            _buffer.style.position = 'absolute'
+            _buffer.style.left = '0'
+            _buffer.style.top = '0'
+            _buffer.style.zIndex = '-1'
+            document.body.appendChild(_buffer)
         }
 
-        const cs = window.getComputedStyle(textarea as Element);
-        const pl = parseInt(cs.paddingLeft);
-        const pr = parseInt(cs.paddingRight);
-        let lh = parseInt(cs.lineHeight);
+        const cs = window.getComputedStyle(textarea as Element)
+        const pl = parseInt(cs.paddingLeft)
+        const pr = parseInt(cs.paddingRight)
+        let lh = parseInt(cs.lineHeight)
 
         // [cs.lineHeight] may return 'normal', which means line height = font size.
-        if (isNaN(lh)) lh = parseInt(cs.fontSize);
+        if (isNaN(lh)) lh = parseInt(cs.fontSize)
 
         // Copy content width.
         if ("clientWidth" in textarea!) {
-            _buffer.style.width = (textarea!.clientWidth - pl - pr) + 'px';
+            _buffer.style.width = (textarea!.clientWidth - pl - pr) + 'px'
         }
 
         // Copy text properties.
         _buffer.style.font = cs.font;
-        _buffer.style.letterSpacing = cs.letterSpacing;
-        _buffer.style.whiteSpace = cs.whiteSpace;
-        _buffer.style.wordBreak = cs.wordBreak;
-        _buffer.style.wordSpacing = cs.wordSpacing;
-        _buffer.style.wordWrap = cs.wordWrap;
+        _buffer.style.letterSpacing = cs.letterSpacing
+        _buffer.style.whiteSpace = cs.whiteSpace
+        _buffer.style.wordBreak = cs.wordBreak
+        _buffer.style.wordSpacing = cs.wordSpacing
+        _buffer.style.wordWrap = cs.wordWrap
 
         // Copy value.
-        _buffer.value = textarea!.value;
+        _buffer.value = textarea!.value
 
-        let result = Math.floor(_buffer.scrollHeight / lh);
-        if (result === 0) result = 1;
-        return result <= 7;
+        let result = Math.floor(_buffer.scrollHeight / lh)
+        if (result === 0) result = 1
+        return result <= 7
 
     }
 
@@ -113,10 +113,10 @@ export default function App() {
 
     const _handleClose = (event: React.SyntheticEvent, reason?: string) => {
         if (reason === 'clickaway') {
-            return;
+            return
         }
 
-        setOpen(false);
+        setOpen(false)
     };
     const _snackBarHandler = (): [severity: Color, msg: string] => {
         switch (snackBarValue) {

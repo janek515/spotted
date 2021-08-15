@@ -31,16 +31,13 @@ class InstagramUploader:
         self.upload_url = self.base_url + '/rupload_igphoto/'
         self.shared_data_url = self.base_url + '/data/shared_data/'
         self.create_url = self.base_url + '/create/configure/'
-        self.shared_data = None
-        self._get_shared_data()
-        self.logger.info(self.shared_data)
-        # noinspection PyUnresolvedReferences
+        self.shared_data = self._get_shared_data()
         self.csrf_token = self.shared_data['config']['csrf_token']
+        self.logger.info(self.shared_data)
         self.time = str(round(time.time() * 1000)).encode()
         self.password = password
         self.enc_password = self.encrypt_password()
         self.logger.info(self.enc_password)
-
         self.session.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; '
                           'Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
@@ -91,7 +88,7 @@ class InstagramUploader:
         """
         Fetches shared data
         """
-        self.shared_data = self.session.get(
+        return self.session.get(
             self.shared_data_url,
             headers={
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64'
@@ -99,7 +96,6 @@ class InstagramUploader:
                               'ike Gecko) Chrome/86.0.4240.198 Safari/537.36'
             }
         ).json()
-        self.csrf_token = self.shared_data['config']['csrf_token']
 
     def login(self) -> bool:
         """

@@ -17,7 +17,7 @@ app.logger.info(f'{username} _ {password}')
 
 
 @app.route('/api/post_message', methods=['POST'])
-def get_message():
+def post_message():
     message = request.json
     if message is None or message["message"] is (None or ""):
         return {
