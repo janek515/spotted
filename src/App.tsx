@@ -19,7 +19,7 @@ import * as Locales from './locales.json'
  * @property {number} timestamp_ms - time of sending the message in ms
  * @property {string} url - URL pointing to image of the message
  */
-type MessageDocument = {
+interface MessageDocument {
     id: number
     msg: string
     timestamp_ms: number
@@ -114,7 +114,7 @@ export default function App(): React.ReactElement {
      * @returns {boolean} true if content fits
      */
     const checkSize = (): boolean => {
-        if (!textInput.current) throw new Error('textInput cannot be null')
+        if (textInput.current === null) throw new Error('textInput cannot be null')
         const textarea = textInput.current
 
         if (textarea.value.length > 293){
@@ -237,10 +237,10 @@ export default function App(): React.ReactElement {
         })
             .then(res => {
                 res.json()
-                    .then(async json => {
-                        const documents: Array<MessageDocument> = json.documents
+                    .then(json => {
+                        const documents: MessageDocument[] = json.documents
                         for (let i = 0; i < documents.length; i++) {
-                            if (!recentMessagesContainer.current) throw new Error('recentMessagesContainer cant be null')
+                            if (recentMessagesContainer.current === null) throw new Error('recentMessagesContainer cant be null')
                             const messageDocument = documents[i]
                             const imageElement: HTMLImageElement = document.createElement('img')
                             imageElement.src = `proxy/${messageDocument.url}`
@@ -264,7 +264,7 @@ export default function App(): React.ReactElement {
     const _messageHandler = async (): Promise<void> => {
         setTFError(false)
         setTFHelperText('')
-        if (!textInput.current) throw new Error('textInput cannot be null')
+        if (textInput.current === null)  throw new Error('textInput cannot be null')
         const textInputContent = textInput.current.value
         const textInputContentLength: number = textInputContent.trim().length
         if (textInputContentLength === 0) {
@@ -302,7 +302,7 @@ export default function App(): React.ReactElement {
                 if (r.status === 200) {
                     setSnackBarValue(1)
                     setLastMessageContent(textInputContent)
-                    if (!textInput.current) throw new Error('textInput cannot be null')
+                    if (textInput.current === null) throw new Error('textInput cannot be null')
                     textInput.current.value = ''
                     setLastMessageSentTime(Date.now())
                     setSnackbarOpen(true)

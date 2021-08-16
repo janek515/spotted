@@ -1,6 +1,7 @@
 import pymongo
 import time
 
+
 class DBManager:
 
     def __init__(self, db_address: str, db_name: str) -> None:
