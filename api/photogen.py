@@ -10,7 +10,7 @@ class PhotoGen:
         self.logger = logger
         self.name = 'message.jpg'
         self.font = ImageFont.truetype("Lato.ttf", 36, encoding='utf-8')
-        self.base_image = Image.open('bg.jpg')
+        self.base_image = Image.open('bg.png')
         self.draw = ImageDraw.Draw(self.base_image)
         self.base_image_width, self.base_image_height = self.base_image.size
         self.background_color = (47, 49, 51)

@@ -1,52 +1,91 @@
 #  Copyright (c) 2021 Jan Ochwat
 
-from flask import Flask, request
+import flask
 # noinspection PyUnresolvedReferences
 from api.photogen import PhotoGen
 # noinspection PyUnresolvedReferences
 from api.instagram import InstagramUploader
+# noinspection PyUnresolvedReferences
+from api.mongodb import DBManager
+import requests
 import json
 
-app = Flask(__name__, static_folder='../build', static_url_path='/')
+app = flask.Flask(__name__, static_folder='../build', static_url_path='/')
 with open('config.json', 'r') as file:
     data = file.read().replace('\n', '')
 config = json.loads(data)
 username = config['username']
 password = config['password']
 app.logger.info(f'{username} _ {password}')
+db = DBManager(config['databaseAddress'], config['databaseName'])
+
+method_requests_mapping = {
+    'GET': requests.get,
+    'HEAD': requests.head,
+    'POST': requests.post,
+    'PUT': requests.put,
+    'DELETE': requests.delete,
+    'PATCH': requests.patch,
+    'OPTIONS': requests.options,
+}
 
 
 @app.route('/api/post_message', methods=['POST'])
 def post_message():
-    message = request.json
-    if message is None or message["message"] is (None or ""):
+    message = flask.request.json
+    if message is None or message['message'] is (None or ''):
         return {
-                   "post": "unsuccessful",
-                   "reason": "Bad Request"
+                   'post': 'unsuccessful',
+                   'reason': 'Bad Request'
                }, 400
-    message = message["message"]
-    generator = PhotoGen(message, app.logger)
+    generator = PhotoGen(message['message'], app.logger)
     uploader = InstagramUploader(username, password, generator.generate(), app.logger)
     if not uploader.login():
         return {
-            "post": "unsuccessful",
-            "reason": "Login error"
+            'post': 'unsuccessful',
+            'reason': 'Login error'
         }, 500
+    # noinspection PyBroadException
     try:
-        status = uploader.upload()
+        response = uploader.upload()
     except Exception:
         return {
-            "post": "unsuccessful",
-            "reason": "Couldn't upload photo"
+            'post': 'unsuccessful',
+            'reason': 'Couldn\'t upload photo'
         }, 500
-    if status.status_code == 200:
+    if response.status_code == 200:
         uploader.log_out()
-        return {"post": "successful"}
+        db.insert_new_document(message['message'], response.json()["media"]["image_versions2"]["candidates"][2]["url"])
+        return {'post': 'successful'}
     return {
-               "post": "unsuccessful",
-               "reason": "Upload API Error",
-               "message": status.text
+               'post': 'unsuccessful',
+               'reason': 'Upload API Error',
+               'message': response.text
            }, 500
+
+
+@app.route('/api/get_latest_messages', methods=['GET'])
+def get_latest_messages():
+    if flask.request.args is None or len(flask.request.args) is not 1:
+        return {
+            'error': 'Bad Request'
+        }, 400
+    n = int(flask.request.args['n'])
+    documents = db.get_latest_n(n)
+    return {
+        'documents': documents
+    }
+
+
+@app.route('/proxy/<path:url>', methods=method_requests_mapping.keys())
+def proxy(url):
+    requests_function = method_requests_mapping[flask.request.method]
+    request = requests_function(url, stream=True, params=flask.request.args)
+    response = flask.Response(flask.stream_with_context(request.iter_content()),
+                              content_type=request.headers['content-type'],
+                              status=request.status_code)
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 
 @app.route('/')

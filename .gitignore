@@ -176,3 +176,5 @@ dmypy.json
 message.jpg
 test.py
 api/misc
+/.yarnclean
+/config.pochwix.json

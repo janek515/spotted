@@ -8,7 +8,15 @@
     "TooLong": "Message is too long",
     "CantBeEmpty": "Message cannot be empty",
     "Dupes": "Cannot send duplicate messages",
-    "WriteMessageHere": "Write the message here"
+    "WriteMessageHere": "Write the message here",
+    "RecentMessages": "Recent Messages",
+    "Minutes": "minutes",
+    "Minute": "minute",
+    "Hours": "hours",
+    "Hour": "hour",
+    "Days": "days",
+    "Day": "day",
+    "Ago": "ago"
   },
   "pl-PL": {
     "Message" : "Wiadomość",
@@ -19,6 +27,14 @@
     "TooLong": "Wiadomość jest za długa.",
     "CantBeEmpty": "Wiadomość nie może być pusta.",
     "Dupes": "Nie można wysłać takiej samej wiadomości.",
-    "WriteMessageHere": "Wpisz wiadomość tutaj"
+    "WriteMessageHere": "Wpisz wiadomość tutaj",
+    "RecentMessages": "Ostatnie Wiadomości",
+    "Minutes": "minuty",
+    "Minute": "minutę",
+    "Hours": "godziny",
+    "Hour": "godzinę",
+    "Days": "dni",
+    "Day": "dzień",
+    "Ago": "temu"
   }
 }

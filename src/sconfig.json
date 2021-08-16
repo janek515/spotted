@@ -1,5 +1,6 @@
 {
   "locale": "en-US",
   "Header": "Spotted",
-  "TimeBetweenMessages": "10"
+  "TimeBetweenMessages": 10,
+  "RecentMessagesCount": 5
 }

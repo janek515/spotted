@@ -1,4 +1,6 @@
 {
-  "username": "<instagram username>",
-  "password": "<instagram password>"
+  "username": "",
+  "password": "",
+  "databaseAddress": "",
+  "databaseName": ""
 }

@@ -1,25 +1,9 @@
 body {
   background-color: #282c34;
 }
-.App {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  text-align: center;
-  font-size: 64px;
-  font-weight: bold;
+img {
+    display: block;
 }
-.App-header{
-  margin:25px;
-}
-.message {
-  width: 95%;
-  max-width: 355px;
-}
-#sendButton {
-  color: black;
-  width: 75%;
-  max-width: 420px;
+abbr {
+    text-decoration: none;
 }
