@@ -2,9 +2,7 @@
 import requests
 import time
 import json
-import datetime
 import random
-from tzlocal import get_localzone
 import Cryptodome.Random
 from Cryptodome.Cipher import AES
 import libnacl.sealed
@@ -15,15 +13,19 @@ import logging
 
 
 # Based on:
-# https://stackoverflow.com/a/62799458/11643883 ,
 # https://github.com/jlobos/instagram-web-api
 
 
 class InstagramUploader:
 
-    def __init__(self, username: str, password: str, photo: bytes,
+    def __init__(self, username: str, password: str,
                  logger: logging.Logger):
-        self.photo = photo
+        """
+        Initializes InstagramUploader object.
+        @param username: Instagram username
+        @param password: Instagram password
+        @param logger: logger
+        """
         self.session = requests.session()
         self.username = username
         self.logger = logger
@@ -36,9 +38,7 @@ class InstagramUploader:
         self.shared_data = self._get_shared_data()
         self.csrf_token = self.shared_data['config']['csrf_token']
         self.logger.info(self.shared_data)
-        self.time = str(round(time.time() * 1000)).encode()
-        self.password = password
-        self.enc_password = self.encrypt_password()
+        self.enc_password = self.encrypt_password(password)
         self.logger.info(self.enc_password)
         self.session.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; '
@@ -50,54 +50,25 @@ class InstagramUploader:
             'X-Requested-With': 'XMLHttpRequest',
             'Referer': self.base_url
         }
-        self.tz = get_localzone()
-        self.now = None
-        self.offset = -int(datetime.datetime.now()
-                           .astimezone(self.tz).utcoffset().total_seconds() / 60)
-        self.upload_params = {
-            "media_type": 1,
-            "upload_id": str(round(time.time() * 1000)),
-            "upload_media_height": 1080,
-            "upload_media_width": 1080,
-            "xsharing_user_ids": "[]",
-            "image_compression": json.dumps({
-                "lib_name": 'moz',
-                "lib_version": '3.1.m',
-                "quality": '80'
-            })
-        }
-        self.entity_name = f'{round(time.time() * 1000)}' \
-                           f'_0_{random.randrange(1000000000, 9999999999)}'
-        self.photo_headers = {
-            'x-entity-type': 'image/jpeg',
-            'offset': '0',
-            'x-entity-name': self.entity_name,
-            'x-instagram-rupload-params': json.dumps(self.upload_params),
-            'x-entity-length': str(len(photo)),
-            'Content-Length': str(len(photo)),
-            'Content-Type': 'application/octet-stream',
-            'x-ig-app-id': '1217981644879628',
-            'Accept-Encoding': 'gzip',
-            'X-Pigeon-Rawclienttime': str(round(time.time(), 3)),
-            'X-IG-Connection-Speed': f'{random.randrange(1000, 3700)}kbps',
-            'X-IG-Bandwidth-Speed-KBPS': '-1.000',
-            'X-IG-Bandwidth-TotalBytes-B': '0',
-            'X-IG-Bandwidth-TotalTime-MS': '0'
-        }
-        self.photo_response = None
 
-    def _get_shared_data(self):
+    def _get_shared_data(self) -> dict:
         """
         Fetches shared data
+        @return: the shared data
+        @rtype: dict
         """
-        return self.session.get(
+        shared_data = self.session.get(
             self.shared_data_url,
             headers={
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64'
                               '; x64) AppleWebKit/537.36 (KHTML, l'
                               'ike Gecko) Chrome/86.0.4240.198 Safari/537.36'
             }
-        ).json()
+        )
+        try:
+            return shared_data.json()
+        except json.JSONDecodeError:
+            raise Exception('Invalid shared data response')
 
     def login(self) -> bool:
         """
@@ -119,32 +90,62 @@ class InstagramUploader:
                 "ig_cb": '1'
             }
         ).json()
-        if login_response["status"] == "fail" \
-                or login_response["authenticated"] == "False":
+        self.logger.info(login_response)
+        if login_response["status"] == "fail" or not login_response["authenticated"]:
             self.logger.error("Failed to login")
             return False
         self.logger.info("Logged in successfully")
         return True
 
-    def upload(self) -> requests.Response:
+    def upload(self, photo: bytes) -> requests.Response:
         """
         Uploads the photo
+        @param photo: Photo to upload
         @return: Photo upload response
         @rtype: requests.Response
         """
-        self.now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S ")
-        self.photo_response = self.session.request(
+        entity_name = f'{round(time.time() * 1000)}' \
+                      f'_0_{random.randrange(1000000000, 9999999999)}'
+        upload_params = {
+            "media_type": 1,
+            "upload_id": str(round(time.time() * 1000)),
+            "upload_media_height": 1080,
+            "upload_media_width": 1080,
+            "xsharing_user_ids": "[]",
+            "image_compression": json.dumps({
+                "lib_name": 'moz',
+                "lib_version": '3.1.m',
+                "quality": '80'
+            })
+        }
+        headers = {
+            'x-entity-type': 'image/jpeg',
+            'offset': '0',
+            'x-entity-name': entity_name,
+            'x-instagram-rupload-params': json.dumps(upload_params),
+            'x-entity-length': str(len(photo)),
+            'Content-Length': str(len(photo)),
+            'Content-Type': 'application/octet-stream',
+            'x-ig-app-id': '1217981644879628',
+            'Accept-Encoding': 'gzip',
+            'X-Pigeon-Rawclienttime': str(round(time.time(), 3)),
+            'X-IG-Connection-Speed': f'{random.randrange(1000, 3700)}kbps',
+            'X-IG-Bandwidth-Speed-KBPS': '-1.000',
+            'X-IG-Bandwidth-TotalBytes-B': '0',
+            'X-IG-Bandwidth-TotalTime-MS': '0'
+        }
+        photo_response = self.session.request(
             'POST',
-            self.upload_url + self.entity_name,
-            headers=self.photo_headers,
-            data=self.photo
+            self.upload_url + entity_name,
+            headers=headers,
+            data=photo
         ).json()
-        if 'upload_id' in self.photo_response:
+        if 'upload_id' in photo_response:
             upload_response = self.session.request(
                 'POST',
                 self.create_url,
                 data={
-                    "upload_id": str(self.photo_response['upload_id']),
+                    "upload_id": str(photo_response['upload_id']),
                     "caption": "",
                     "custom_accessibility_caption": "",
                     "retry_timeout": "",
@@ -157,16 +158,17 @@ class InstagramUploader:
             return upload_response
         raise Exception('Failed to upload the photo')
 
-    def encrypt_password(self) -> str:
+    def encrypt_password(self, password: str) -> str:
         """
         Encrypts the password
+        @param password: password to encrypt
         @return: Encrypted password
         @rtype: str
         """
         current_time_bytes = str(round(time.time())).encode()
         public_key_bytes = bytes.fromhex(self.shared_data["encryption"]["public_key"])
         key = Cryptodome.Random.get_random_bytes(32)
-        plain_text = self.password.encode()
+        plain_text = password.encode()
         cipher = AES.new(key, AES.MODE_GCM, nonce=bytes([0] * 12))
         cipher.update(current_time_bytes)
         cipher_text, tag = cipher.encrypt_and_digest(plain_text)
@@ -183,7 +185,7 @@ class InstagramUploader:
 
     def log_out(self):
         """
-        Logs out
+        Logs out from instagram
         """
         self._get_shared_data()
         try:

@@ -1,11 +1,12 @@
-# Spotted
-[![DeepSource](https://deepsource.io/gh/janek515/spotted.svg/?label=active+issues&show_trend=true&token=DGh9kVWwA_5IaekPOq5Dc11m)](https://deepsource.io/gh/janek515/spotted/?ref=repository-badge)  
+# Spotted ![GitHub last commit](https://img.shields.io/github/last-commit/janek515/spotted) [![DeepSource](https://deepsource.io/gh/janek515/spotted.svg/?label=active+issues&show_trend=true&token=DGh9kVWwA_5IaekPOq5Dc11m)](https://deepsource.io/gh/janek515/spotted/?ref=repository-badge) ![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/janek515/spotted)
 Spotted React App which transforms messages into images and uploads them to instagram.
+
+[//]: # "TODO Add features preview"
 
 # Dependencies
 
 ### Prerequisites
-- [Python 3.9](https://www.python.org/downloads/)
+- ![](https://img.shields.io/github/pipenv/locked/python-version/janek515/spotted)
 - [`yarn`](https://yarnpkg.com/cli/install) or `npm`
 
 In order to install dependencies use yarn and pipenv.

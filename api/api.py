@@ -2,7 +2,7 @@
 
 import flask
 # noinspection PyUnresolvedReferences
-from api.photogen import PhotoGen
+from api.photogen import PhotoGenerator
 # noinspection PyUnresolvedReferences
 from api.instagram import InstagramUploader
 # noinspection PyUnresolvedReferences
@@ -32,27 +32,24 @@ method_requests_mapping = {
 
 @app.route('/api/post_message', methods=['POST'])
 def post_message():
+    """
+    Endpoint for posting messages
+    @return: response message
+    """
     message = flask.request.json
     if message is None or message['message'] is (None or ''):
         return {
                    'post': 'unsuccessful',
                    'reason': 'Bad Request'
                }, 400
-    generator = PhotoGen(message['message'], app.logger)
-    uploader = InstagramUploader(username, password, generator.generate(), app.logger)
+    generator = PhotoGenerator(message['message'], app.logger)
+    uploader = InstagramUploader(username, password, app.logger)
     if not uploader.login():
         return {
             'post': 'unsuccessful',
             'reason': 'Login error'
         }, 500
-    # noinspection PyBroadException
-    try:
-        response = uploader.upload()
-    except Exception:
-        return {
-            'post': 'unsuccessful',
-            'reason': 'Couldn\'t upload photo'
-        }, 500
+    response = uploader.upload(generator.generate())
     if response.status_code == 200:
         uploader.log_out()
         db.insert_new_document(message['message'], response.json()["media"]["image_versions2"]["candidates"][2]["url"])
@@ -66,6 +63,10 @@ def post_message():
 
 @app.route('/api/get_latest_messages', methods=['GET'])
 def get_latest_messages():
+    """
+    Endpoint for getting latest n messages
+    @return: last n messages
+    """
     if flask.request.args is None or len(flask.request.args) is not 1:
         return {
             'error': 'Bad Request'
@@ -79,6 +80,11 @@ def get_latest_messages():
 
 @app.route('/proxy/<path:url>', methods=method_requests_mapping.keys())
 def proxy(url):
+    """
+    Proxy for bypassing instagram cors policy
+    @param url: url to proxy
+    @return: instgram response
+    """
     requests_function = method_requests_mapping[flask.request.method]
     request = requests_function(url, stream=True, params=flask.request.args)
     response = flask.Response(flask.stream_with_context(request.iter_content()),
@@ -90,4 +96,8 @@ def proxy(url):
 
 @app.route('/')
 def index():
+    """
+    Endpoint for accessing the main page of the application
+    @return: page
+    """
     return app.send_static_file('index.html')

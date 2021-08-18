@@ -1,10 +1,9 @@
-import re
 from PIL import ImageFont
 
 
 def text_wrap(text: str, font: ImageFont.FreeTypeFont, max_width: int) -> str:
     """
-
+    Text wrapper
     @param text: Text to wrap
     @type text: str
     @param font: Font that the text will be displayed with
@@ -15,19 +14,10 @@ def text_wrap(text: str, font: ImageFont.FreeTypeFont, max_width: int) -> str:
     @rtype: str
     """
     lines = []
-    text_list = []
-
-    # This checks for any special characters that font.getsize does not like
-    # (it's made for polish alphabet)
-    for letter in text:
-        if re.match('[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]', letter) is not None:
-            text_list.append('w')
-        else:
-            text_list.append(letter)
-    compatible_text = ''.join(text_list)
+    # TODO: implement emoji
     # If the text width is smaller than the image width, then no need to split
     # just add it to the line list and return
-    if font.getsize(compatible_text)[0] <= max_width:
+    if font.getsize(text)[0] <= max_width:
         return text
     # split the line by spaces to get words
     words = text.split(' ')

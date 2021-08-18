@@ -4,22 +4,25 @@ from api.text_wrap import text_wrap
 import logging
 
 
-class PhotoGen:
+class PhotoGenerator:
 
     def __init__(self, message: str, logger: logging.Logger):
+        """
+        Initializes the PhotoGen object
+        @param message: the message to put in the image
+        @param logger: logger to use
+        """
         self.logger = logger
         self.name = 'message.jpg'
         self.font = ImageFont.truetype("Lato.ttf", 36, encoding='utf-8')
         self.base_image = Image.open('bg.png')
-        self.draw = ImageDraw.Draw(self.base_image)
+        self.image = ImageDraw.Draw(self.base_image)
         self.base_image_width, self.base_image_height = self.base_image.size
         self.background_color = (47, 49, 51)
         self.font_color = (255, 255, 255)
-        # You can vary the size of the rect by changing the fraction of blank area over
-        # the image size
         self.text_box_width, self.text_box_height = (0.168, 0.36)
         self.padding = 10
-        self.rectXY = [
+        self.rectangleSize = [
             (self.text_box_width * self.base_image_width,
              self.text_box_height * self.base_image_height),
             (self.base_image_width - self.text_box_width * self.base_image_width,
@@ -35,8 +38,13 @@ class PhotoGen:
         self.logger.info(self.text)
 
     def generate(self) -> bytes:
-        self.draw.rectangle(self.rectXY, self.background_color)
-        self.draw.multiline_text(
+        """
+        Generates the message image
+        @return: image as bytes
+        """
+
+        self.image.rectangle(self.rectangleSize, self.background_color)
+        self.image.multiline_text(
             (self.text_box_width * self.base_image_width + self.padding,
              self.text_box_height * self.base_image_height + self.padding),
             self.text,
