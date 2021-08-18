@@ -2,9 +2,10 @@
 import React, {Component} from "react"
 import MuiAlert, {Color} from "@material-ui/lab/Alert"
 import Snackbar from "@material-ui/core/Snackbar"
+import { ILocale } from "./App";
 
 export interface IAlertBarProps {
-    localeStrings: Record<string, string>
+    localeStrings: ILocale
 }
 
 export interface IAlertBarState {
@@ -19,7 +20,7 @@ export default class AlertBar extends Component<IAlertBarProps, IAlertBarState> 
             open: false,
             value: 0
         }
-        this._handleClose = this._handleClose.bind(this)
+        this.handleClose = this.handleClose.bind(this)
     }
 
     /**
@@ -27,7 +28,7 @@ export default class AlertBar extends Component<IAlertBarProps, IAlertBarState> 
      * @param event handle for the close event
      * @param reason reason for the close
      */
-    _handleClose (event: React.SyntheticEvent, reason?: string): void {
+    handleClose (event: React.SyntheticEvent, reason?: string): void {
         if (reason === 'clickaway') {
             return
         }
@@ -74,16 +75,17 @@ export default class AlertBar extends Component<IAlertBarProps, IAlertBarState> 
 
 
     render(): JSX.Element {
+        const { open } = this.state
         return(
             <Snackbar
-                    open={this.state.open}
+                    open={open}
                     autoHideDuration={4000}
-                    onClose={this._handleClose}
+                    onClose={this.handleClose}
                 >
                     <MuiAlert
                         elevation={6}
                         variant="filled"
-                        onClose={this._handleClose}
+                        onClose={this.handleClose}
                         severity={this._snackBarHandler()[0]}
                     >
                         {this._snackBarHandler()[1]}

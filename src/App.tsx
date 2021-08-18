@@ -10,6 +10,25 @@ import * as Locales from './locales.json'
 import AlertBar from './AlertBar'
 import RecentMessages from "./RecentMessages"
 
+export interface ILocale {
+    Message: string
+    SendMessage: string
+    Error: string
+    CalmDown: string
+    Success: string
+    TooLong: string
+    CantBeEmpty: string
+    Dupes: string
+    WriteMessageHere: string
+    RecentMessages: string
+    Minute: string
+    Minutes: string
+    Hour: string
+    Hours: string
+    Day: string
+    Days: string
+    Ago: string
+}
 
 export const useStyles = makeStyles((theme: Theme) => createStyles({
     wrapper: {
@@ -89,7 +108,7 @@ export default function App(): React.ReactElement {
     const [lastMessageContent, setLastMessageContent] = React.useState<string>('')
 
     const locales = JSON.parse(JSON.stringify(Locales)).default
-    const strings: Record<string, string> = locales[Config.locale]
+    const strings: ILocale = locales[Config.locale]
 
     const textInput = React.useRef<HTMLTextAreaElement>(null)
     const alertBar = React.useRef<AlertBar>(null)

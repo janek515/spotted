@@ -2,6 +2,7 @@
 import React, { Component } from "react"
 import { ClassNameMap } from '@material-ui/styles/withStyles'
 import * as Config from "./sconfig.json"
+import { ILocale } from './App'
 
 /**
  * Wrapper for message document sent from DB
@@ -18,7 +19,7 @@ interface IRecentMessageDocument {
 }
 
 interface IRecentMessagesProps {
-    localeStrings: Record<string, string>
+    localeStrings: ILocale
     classes: ClassNameMap<"progress" | "wrapper" | "recentMessage" | "recentMessageLabel" | "appHeader" | "message" | "sendButton" | "App" | "recentMessagesContainer" | "recentMessagesHeader">
 }
 
@@ -34,6 +35,11 @@ export default class RecentMessages extends Component<IRecentMessagesProps> {
         void this._recentMessagesDisplay()
     }
 
+    shouldComponentUpdate(): boolean {
+        const { classes } = this.props
+        return document.getElementsByClassName(classes.recentMessage)[0] === undefined
+    }
+
     /**
      * Fetches and displays recent messages on the page
      */
@@ -47,6 +53,7 @@ export default class RecentMessages extends Component<IRecentMessagesProps> {
                 await res.json()
                     .then(json => {
                         const documents: IRecentMessageDocument[] = json.documents
+                        const { classes } = this.props
                         for (let i = 0; i < documents.length; i++) {
                             if (this.recentMessagesContainer.current === null) throw new Error('recentMessagesContainer cant be null')
                             const messageDocument = documents[i]
@@ -54,7 +61,7 @@ export default class RecentMessages extends Component<IRecentMessagesProps> {
                             const imageElement: HTMLImageElement = document.createElement('img')
                             
                             imageElement.src = `proxy/${messageDocument.url}`
-                            imageElement.className = this.props.classes.recentMessage
+                            imageElement.className = classes.recentMessage
                             
                             this.recentMessagesContainer.current.appendChild(imageElement)
                             
@@ -63,7 +70,7 @@ export default class RecentMessages extends Component<IRecentMessagesProps> {
                             labelElement.innerText = this._getTimeElapsedString(messageDocument.timestamp_ms)
                             const messageTimestamp = new Date(messageDocument.timestamp_ms)
                             labelElement.title = messageTimestamp.toLocaleString(Config.locale)
-                            labelElement.className = this.props.classes.recentMessageLabel
+                            labelElement.className = classes.recentMessageLabel
                             
                             this.recentMessagesContainer.current.appendChild(labelElement)
                         }
@@ -77,29 +84,31 @@ export default class RecentMessages extends Component<IRecentMessagesProps> {
      * @param timestampMs timestamp of the message
      */
     _getTimeElapsedString (timestampMs: number): string {
+        const { localeStrings } = this.props
         const timeElapsedMs = Date.now() - timestampMs
         const ONE_HOUR_MS = 60 * 60 * 1000
         const ONE_DAY_MS = 24 * ONE_HOUR_MS
         if (timeElapsedMs < ONE_HOUR_MS){
             const minutes: number = Math.round(timeElapsedMs / 60000)
-            return `${minutes} ${minutes === 1 ? this.props.localeStrings.Minute : this.props.localeStrings.Minutes} ${this.props.localeStrings.Ago}`
+            return `${minutes} ${minutes === 1 ? localeStrings.Minute : localeStrings.Minutes} ${localeStrings.Ago}`
         }
         if (timeElapsedMs < ONE_DAY_MS){
             const hours: number = Math.round(timeElapsedMs / ONE_HOUR_MS)
-            return `${hours} ${hours === 1 ? this.props.localeStrings.Hour : this.props.localeStrings.Hours} ${this.props.localeStrings.Ago}`
+            return `${hours} ${hours === 1 ? localeStrings.Hour : localeStrings.Hours} ${localeStrings.Ago}`
         }
         const days: number = Math.round(timeElapsedMs / ONE_DAY_MS)
-        return `${days} ${days === 1 ? this.props.localeStrings.Day : this.props.localeStrings.Days} ${this.props.localeStrings.Ago}`
+        return `${days} ${days === 1 ? localeStrings.Day : localeStrings.Days} ${localeStrings.Ago}`
     }
 
 
     render(): JSX.Element {
+        const { classes , localeStrings } = this.props
         return (
             <div>
-                <span className={this.props.classes.recentMessagesHeader}>
-                        {this.props.localeStrings.RecentMessages}
+                <span className={classes.recentMessagesHeader}>
+                        {localeStrings.RecentMessages}
                 </span>
-                <div className={this.props.classes.recentMessagesContainer} ref={this.recentMessagesContainer}/>
+                <div className={classes.recentMessagesContainer} ref={this.recentMessagesContainer}/>
             </div>
         )
     }
