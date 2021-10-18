@@ -32,7 +32,7 @@ export default class RecentMessages extends Component<IRecentMessagesProps> {
     }
 
     componentDidMount(): void {
-        this._recentMessagesDisplay().then(() => {})
+        void this._recentMessagesDisplay()
     }
 
     shouldComponentUpdate(): boolean {

@@ -1,5 +1,4 @@
 #  Copyright (c) 2021 Jan Ochwat
-import PIL.Image
 from PIL import Image, ImageDraw, ImageFont
 from api.text_wrap import text_wrap
 import logging
