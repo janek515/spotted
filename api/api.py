@@ -80,13 +80,15 @@ def get_latest_messages():
 
 
 @app.route('/proxy/<path:url>', methods=method_requests_mapping.keys())
-def proxy(url):
+def proxy(url: str):
     """
     Proxy for bypassing instagram cors policy
     @param url: url to proxy
     @return: instgram response
     """
     requests_function: function = method_requests_mapping[flask.request.method]
+    if url.startswith('https:/') and not url.startswith('https://'):
+        url = 'https://' + url[7::]
     request: requests.Response = requests_function(url, stream=True, params=flask.request.args)
     response: flask.Response = flask.Response(flask.stream_with_context(request.iter_content()),
                                               content_type=request.headers['content-type'],
