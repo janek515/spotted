@@ -13,14 +13,14 @@ def text_wrap(text: str, font: ImageFont.FreeTypeFont, max_width: int) -> str:
     @return: Wrapped text
     @rtype: str
     """
-    lines = []
+    lines: list[str] = []
     # TODO: implement emoji
     # If the text width is smaller than the image width, then no need to split
     # just add it to the line list and return
     if font.getsize(text)[0] <= max_width:
         return text
     # split the line by spaces to get words
-    words = text.split(' ')
+    words: list[str] = text.split(' ')
     i = 0
     # append every word to a line while its width is shorter than the image width
     while i < len(words):

@@ -134,7 +134,7 @@ class InstagramUploader:
             'X-IG-Bandwidth-TotalBytes-B': '0',
             'X-IG-Bandwidth-TotalTime-MS': '0'
         }
-        photo_response = self.session.request(
+        photo_response: dict = self.session.request(
             'POST',
             self.upload_url + entity_name,
             headers=headers,

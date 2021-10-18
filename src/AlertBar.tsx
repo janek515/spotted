@@ -61,15 +61,17 @@ export default class AlertBar extends Component<IAlertBarProps, IAlertBarState> 
      * Handles snackbar color and message
       */
     _snackBarHandler (): [severity: Color, msg: string] {
-        switch (this.state.value) {
+        const {localeStrings} = this.props
+        const {value} = this.state
+        switch (value) {
             case 1:
-                return ['success', this.props.localeStrings.Success]
+                return ['success', localeStrings.Success]
             case 2:
-                return ['error', this.props.localeStrings.CalmDown]
+                return ['error', localeStrings.CalmDown]
             case 3:
-                return ['error', this.props.localeStrings.Dupes]
+                return ['error', localeStrings.Dupes]
             default:
-                return ['error', this.props.localeStrings.Error]
+                return ['error', localeStrings.Error]
         }
     }
 

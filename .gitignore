@@ -178,3 +178,5 @@ test.py
 api/misc
 /.yarnclean
 /config.pochwix.json
+
+private.txt

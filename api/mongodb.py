@@ -11,7 +11,7 @@ class DBManager:
         @param db_name: database name
         """
         self.client = pymongo.MongoClient(db_address)
-        self.col = self.client[db_name]['data']
+        self.col: pymongo.collection.Collection = self.client[db_name]['data']
 
     def get_latest_n(self, n: int) -> list[dict]:
         """
