@@ -85,7 +85,7 @@ def proxy(url: str):
     @param url: url to proxy
     @return: instgram response
     """
-    requests_function: function = method_requests_mapping[flask.request.method]
+    requests_function = method_requests_mapping[flask.request.method]
     if url.startswith('https:/') and not url.startswith('https://'):
         url = 'https://' + url[7::]
     request: requests.Response = requests_function(url, stream=True, params=flask.request.args)
