@@ -180,3 +180,5 @@ api/misc
 /config.pochwix.json
 
 private.txt
+
+/.yarn

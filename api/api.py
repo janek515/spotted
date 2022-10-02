@@ -1,5 +1,4 @@
 #  Copyright (c) 2021 Jan Ochwat
-from builtins import function
 
 import flask
 # noinspection PyUnresolvedReferences
@@ -68,7 +67,7 @@ def get_latest_messages():
     Endpoint for getting latest n messages
     @return: last n messages
     """
-    if flask.request.args is None or len(flask.request.args) is not 1:
+    if flask.request.args is None or len(flask.request.args) != 1:
         return {
                    'error': 'Bad Request'
                }, 400
